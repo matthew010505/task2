@@ -26,7 +26,7 @@ const Registration = () => {
 
     if (Object.keys(lst).length === 0) {
       try {
-        const res = await axios.post("http://localhost:8000/register", {
+        const res = await axios.post("http://localhost:backend/register", {
           email,
           password,
         });
