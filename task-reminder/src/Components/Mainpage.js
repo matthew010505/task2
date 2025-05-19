@@ -10,7 +10,7 @@ function Mainpage() {
 
   const addTaskHandler = async (Task) => {
     try {
-      const res = await fetch("http://backend:8000/addtask", {
+      const res = await fetch("http://localhost:8000/addtask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Task),
@@ -29,7 +29,7 @@ function Mainpage() {
 
   const removeTaskHandler = async (id) => {
     try {
-      const res = await fetch(`http://backend:8000/deletetask/${id}`, {
+      const res = await fetch(`http://localhost:8000/deletetask/${id}`, {
         method: "DELETE",
       });
   
@@ -53,7 +53,7 @@ function Mainpage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await fetch("http://backend:8000/tasks");
+        const res = await fetch("http://localhost:8000/tasks");
         const data = await res.json();
         setTasks(data);
       } catch (err) {
