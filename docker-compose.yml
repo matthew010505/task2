@@ -6,11 +6,11 @@ services:
       context: ./task-reminder
       dockerfile: Dockerfile
     ports:
-      - "5174:80"
+      - "3000:3000"
 
   backend:
     build:
       context: ./task-reminder/backend
       dockerfile: Dockerfile
     ports:
-      - "6000:8000"
+      - "8000:8000"

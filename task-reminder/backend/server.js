@@ -127,7 +127,7 @@ app.delete("/deletetask/:id", async (req, res) => {
     const { id } = req.params;
 
     const { error } = await supabase
-      .from("taskdb")
+      .from("taskdb3")
       .delete()
       .eq("id", id); 
 
