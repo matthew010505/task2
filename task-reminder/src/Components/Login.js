@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';  // ✅ import navigate hook
+import { useNavigate } from 'react-router-dom';  
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // ✅ create navigator
-
+  const navigate = useNavigate(); 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -14,7 +13,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8000/login', form);
+      const res = await axios.post('http://backend:8000/login', form);
       setMessage(res.data.message);
       console.log('User:', res.data.user);
 
