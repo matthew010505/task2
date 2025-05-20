@@ -1,94 +1,32 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; 
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const Registration = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [errors, setErrors] = useState({});
-  const navigate = useNavigate(); // ✅ step 2
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleReset = () => {
-    setPassword("");
-    setEmail("");
-  };
-
-  const handleSubmit = async (e) => {
-    let lst = {};
-    if (!email) lst.email = "Email is Required";
-    if (!password || password.length < 8) {
-      lst.password = "Password must be at least 8 characters";
-    }
-
-    setErrors(lst);
-
-    if (Object.keys(lst).length === 0) {
-      try {
-        const res = await axios.post("http://backend:8000/register", {
-          email,
-          password,
-        });
-
-        toast.success("User registered successfully", {
-          position: "top-right",
-        });
-
-        console.log("Registration successful");
-        handleReset();
-
-        navigate("/login");
-
-      } catch (error) {
-        if (error.response) {
-          const { status, data } = error.response;
-          if (status === 400 && data.message === "exist-email") {
-            toast.warning("Email ID already exists", {
-              position: "top-right",
-            });
-          } else {
-            toast.error("Validation error occurred", {
-              position: "top-right",
-            });
-          }
-        } else {
-          toast.error("Registration failed. Try again later.", {
-            position: "top-right",
-          });
-          console.error("Unexpected error: ", error.message);
-        }
-      }
+  const handleSubmit = async e => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:8000/register", { email, password });
+      toast.success("Registered!");
+      navigate("/login");
+    } catch (err) {
+      const msg = err.response?.data?.message;
+      toast.error(msg === "exist-email" ? "Email already exists" : "Registration failed");
     }
   };
 
   return (
-    <div>
-      <h1 className="header">User Details</h1>
-
-      <input
-        placeholder="Enter Email"
-        type="email"
-        value={email}
-        className="input-field"
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      {errors.email && <p>{errors.email}</p>}
-
-      <input
-        placeholder="Enter Password"
-        type="password"
-        value={password}
-        className="input-field"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      {errors.password && <p>{errors.password}</p>}
-
-      <div className="button-container">
-        <button type="submit" onClick={handleSubmit}>Submit</button>
-        <button onClick={handleReset}>Reset</button>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <h2>Sign Up</h2>
+      <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+      <button type="submit">Register</button>
+    </form>
   );
 };
 

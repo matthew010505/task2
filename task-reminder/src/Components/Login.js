@@ -1,56 +1,33 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';  
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://backend:8000/login', form);
-      setMessage(res.data.message);
-      console.log('User:', res.data.user);
-
+      const res = await axios.post('http://localhost:8000/login', form);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate('/home');
     } catch (err) {
-      if (err.response) {
-        setMessage(err.response.data.message);
-      } else {
-        setMessage('Login failed');
-      }
+      setMessage(err.response?.data?.message || 'Login failed');
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <form onSubmit={handleSubmit}>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        /><br /><br />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        /><br /><br />
-        <button type="submit">Login</button>
-      </form>
+      <input name="email" value={form.email} onChange={handleChange} placeholder="Email" required />
+      <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Password" required />
+      <button type="submit">Login</button>
       <p>{message}</p>
-    </div>
+    </form>
   );
 };
 

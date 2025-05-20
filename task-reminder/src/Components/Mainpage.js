@@ -4,71 +4,39 @@ import TaskList from "./TaskList";
 import Header from "./Header";
 
 function Mainpage() {
-  const [Tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
-  
-
-  const addTaskHandler = async (Task) => {
-    try {
-      const res = await fetch("http://backend:8000/addtask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(Task),
-      });
-
-      const result = await res.json();
-      if (res.ok) {
-        setTasks((prev) => [result.data[0], ...prev]);
-      } else {
-        alert(result.error || result.message);
-      }
-    } catch (err) {
-      console.error("Error adding task:", err);
-    }
-  };
-
-  const removeTaskHandler = async (id) => {
-    try {
-      const res = await fetch(`http://backend:8000/deletetask/${id}`, {
-        method: "DELETE",
-      });
-  
-      if (res.ok) {
-        setTasks((prev) => prev.filter((task) => task.id !== id));
-      } else {
-        const result = await res.json();
-        alert("Failed to delete task: " + result.error);
-      }
-    } catch (err) {
-      console.error("Error deleting task:", err);
-    }
-  };
-  
-  
-
-  // const removeTaskHandler = (id) => {
-  //   setTasks(Tasks.filter((task) => task.id !== id));
-  // };
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = user.id;
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const res = await fetch("http://backend:8000/tasks");
-        const data = await res.json();
-        setTasks(data);
-      } catch (err) {
-        console.error("Failed to fetch tasks:", err);
-      }
-    };
+    if (!userId) return;
+    fetch(`http://localhost:8000/tasks?userId=${userId}`)
+      .then(r => r.json())
+      .then(setTasks)
+      .catch(console.error);
+  }, [userId]);
 
-    fetchTasks();
-  }, []);
+  const addTaskHandler = async ({ task, reminder }) => {
+    const res = await fetch("http://localhost:8000/addtask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task, reminder, userId }),
+    });
+    const { data } = await res.json();
+    if (res.ok) setTasks(prev => [data, ...prev]);
+  };
+
+  const removeTaskHandler = async id => {
+    await fetch(`http://localhost:8000/deletetask/${id}`, { method: "DELETE" });
+    setTasks(prev => prev.filter(t => t.id !== id));
+  };
 
   return (
     <div className="ui container">
       <Header />
       <AddTask addTaskHandler={addTaskHandler} />
-      <TaskList Tasks={Tasks} getTaskId={removeTaskHandler} />
+      <TaskList Tasks={tasks} getTaskId={removeTaskHandler} />
     </div>
   );
 }
